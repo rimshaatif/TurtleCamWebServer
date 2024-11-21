@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify, send_from_directory
 import psutil
 import os
 app = Flask(__name__)
@@ -10,11 +10,25 @@ def upload_file():
     # return "File uploaded successfully"
     return render_template("upload.html")
 
-@app.route('/download', methods=['GET'])
+@app.route('/download-files', methods=['GET'])
 def download_file():
+    directory = request.args.get('directory')
+    file = request.args.get('file')
+    return send_from_directory(directory, file, as_attachment=True)
+
+@app.route('/download', methods=['GET'])
+def download():
     
     #return send_file(f'/path/to/files/{filename}', as_attachment=True)
     return render_template("download.html")
+
+@app.route('/list-files', methods=['GET'])
+def list_files():
+    directory = request.args.get('directory')
+    if not os.path.exists(directory):
+        return jsonify([]), 404
+    files = os.listdir(directory)
+    return jsonify(files)
     
 def get_system_info():
     info = {
