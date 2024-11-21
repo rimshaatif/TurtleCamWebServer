@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Download</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        .file-list {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .file-list li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Download Files</h1>
+    <form id="fileForm">
+        <label for="sourceDir">Source Directory:</label><br>
+        <input type="text" id="sourceDir" name="sourceDir" placeholder="/path/to/source" required><br><br>
+        
+        <label for="destinationDir">Save To (Local Path):</label><br>
+        <input type="text" id="destinationDir" name="destinationDir" placeholder="/path/to/destination" required><br><br>
+        
+        <label for="fileList">Available Files:</label>
+        <ul id="fileList" class="file-list">
+            <!-- Files will be dynamically populated -->
+        </ul>
+        
+        <button type="button" onclick="fetchFileList()">Get Files</button>
+        <button type="submit">Download</button>
+    </form>
+
+    <script>
+        // Fetch file list from the source directory
+        async function fetchFileList() {
+            const sourceDir = document.getElementById('sourceDir').value;
+            if (!sourceDir) {
+                alert("Please enter a source directory.");
+                return;
+            }
+
+            try {
+                // Replace with your actual backend endpoint
+                const response = await fetch(`/list-files?directory=${encodeURIComponent(sourceDir)}`);
+                if (!response.ok) throw new Error("Failed to fetch file list");
+
+                const files = await response.json();
+                const fileListEl = document.getElementById('fileList');
+                fileListEl.innerHTML = ''; // Clear the current list
+
+                if (files.length === 0) {
+                    fileListEl.innerHTML = '<li>No files found in the directory.</li>';
+                    return;
+                }
+
+                files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<label><input type="radio" name="selectedFile" value="${file}" required> ${file}</label>`;
+                    fileListEl.appendChild(li);
+                });
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('fileForm').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const sourceDir = document.getElementById('sourceDir').value;
+            const destinationDir = document.getElementById('destinationDir').value;
+            const selectedFile = document.querySelector('input[name="selectedFile"]:checked')?.value;
+
+            if (!selectedFile) {
+                alert("Please select a file to download.");
+                return;
+            }
+
+            // Replace with your actual backend endpoint
+            const downloadUrl = `/download-files?directory=${encodeURIComponent(sourceDir)}&file=${encodeURIComponent(selectedFile)}`;
+
+            // Simulate download (replace this logic with actual backend handling)
+            alert(`Downloading from ${downloadUrl} to ${destinationDir}`);
+            window.open(downloadUrl, '_blank'); // Start download
+        });
+    </script>
+</body>
+</html>
