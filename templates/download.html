@@ -34,6 +34,9 @@
         <label for="destinationDir">Save To (Local Path):</label><br>
         <input type="text" id="destinationDir" name="destinationDir" placeholder="/path/to/destination" required><br><br>
         
+        <label for="zipName">ZIP File Name:</label>
+        <input type="text" id="zipName" placeholder="Enter ZIP file name (optional)">
+
         <label for="fileList">Available Files:</label>
         <ul id="fileList" class="file-list">
             <!-- Files will be dynamically populated -->
@@ -90,7 +93,8 @@
             }
 
             // Replace with your actual backend endpoint
-            const downloadUrl = `/download-multiple?directory=${encodeURIComponent(sourceDir)}&files=${encodeURIComponent(JSON.stringify(selectedFiles))}`;
+            const zipName = document.getElementById("zipName").value || "files"; 
+            const downloadUrl = `/download-multiple?directory=${encodeURIComponent(sourceDir)}&files=${encodeURIComponent(JSON.stringify(selectedFiles))}&zipName=${encodeURIComponent(zipName)}`;
 
             // Simulate download (replace this logic with actual backend handling)
             alert(`Downloading files from ${downloadUrl}`);

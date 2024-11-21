@@ -18,6 +18,7 @@ def download_multiple():
     directory = request.args.get('directory')
     files = request.args.get('files')
     files = json.loads(files)  # Parse the JSON string into a Python list
+    zip_name = request.args.get('zipName', 'files')  # Default to 'files.zip'
 
     if not os.path.exists(directory):
         return "Directory not found", 404
@@ -31,12 +32,13 @@ def download_multiple():
                 zip_file.write(file_path, file_name)  # Add file to the ZIP archive
     zip_buffer.seek(0)
 
-    # Serve the ZIP file for download
+   # Prepare ZIP file for download
+    zip_name_with_ext = f"{zip_name}.zip"
     return send_file(
         zip_buffer,
         mimetype='application/zip',
         as_attachment=True,
-        download_name='files.zip'
+        download_name=zip_name_with_ext
     )
 
 @app.route('/download', methods=['GET'])
