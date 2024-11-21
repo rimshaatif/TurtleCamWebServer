@@ -59,6 +59,19 @@
             color: #555;
             line-height: 1.6;
         }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9f5e9;
+            border: 1px solid #d4ebd4;
+            border-radius: 5px;
+        }
+        .status h3 {
+            color: #4CAF50;
+        }
+        .status p {
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -74,12 +87,19 @@
         <div class="image-section">
             <img src="{{ url_for('static', filename='turtle.png') }}" alt="Image of the Product">
         </div>
+        <div class="status">
+            <h3>Raspberry Pi Status</h3>
+            <p><strong>Memory Usage:</strong> {{ status['memory'] }}%</p>
+            <p><strong>Disk Usage:</strong> {{ status['disk'] }}%</p>
+            <p><strong>Uptime:</strong> {{ status['uptime'] }}</p>
+        </div>
         <div class="content">
             <h2>What is the product?</h2>
             <p>The Turtle Cam is a budget-friendly water-proof camera that can be attached to the back of freshwater turtles to observe their daily activities.</p>
             <h2>Why we created the product?</h2>
             <p>The data collected with the Turtle Cam will be used towards research that will help with the preservation of freshwater turtles.</p>
         </div>
+        
     </div>
 </body>
 </html>
