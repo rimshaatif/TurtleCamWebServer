@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Download</title>
+    <title>Multi-File Download</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,7 +40,7 @@
         </ul>
         
         <button type="button" onclick="fetchFileList()">Get Files</button>
-        <button type="submit">Download</button>
+        <button type="submit">Download Selected Files</button>
     </form>
 
     <script>
@@ -68,7 +68,7 @@
 
                 files.forEach(file => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<label><input type="radio" name="selectedFile" value="${file}" required> ${file}</label>`;
+                    li.innerHTML = `<label><input type="checkbox" name="selectedFiles" value="${file}"> ${file}</label>`;
                     fileListEl.appendChild(li);
                 });
             } catch (error) {
@@ -81,19 +81,19 @@
             event.preventDefault(); // Prevent default form submission
 
             const sourceDir = document.getElementById('sourceDir').value;
-            const destinationDir = document.getElementById('destinationDir').value;
-            const selectedFile = document.querySelector('input[name="selectedFile"]:checked')?.value;
+            const selectedFiles = Array.from(document.querySelectorAll('input[name="selectedFiles"]:checked'))
+                .map(input => input.value);
 
-            if (!selectedFile) {
-                alert("Please select a file to download.");
+            if (selectedFiles.length === 0) {
+                alert("Please select at least one file to download.");
                 return;
             }
 
             // Replace with your actual backend endpoint
-            const downloadUrl = `/download-files?directory=${encodeURIComponent(sourceDir)}&file=${encodeURIComponent(selectedFile)}`;
+            const downloadUrl = `/download-multiple?directory=${encodeURIComponent(sourceDir)}&files=${encodeURIComponent(JSON.stringify(selectedFiles))}`;
 
             // Simulate download (replace this logic with actual backend handling)
-            alert(`Downloading from ${downloadUrl} to ${destinationDir}`);
+            alert(`Downloading files from ${downloadUrl}`);
             window.open(downloadUrl, '_blank'); // Start download
         });
     </script>

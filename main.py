@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request, send_file, jsonify, send_from_directory
+from flask import Flask, render_template, request, send_file, jsonify
 import psutil
 import os
+import json
+import zipfile
+import io
 app = Flask(__name__)
 
 @app.route('/upload', methods=['POST'])
@@ -10,11 +13,31 @@ def upload_file():
     # return "File uploaded successfully"
     return render_template("upload.html")
 
-@app.route('/download-files', methods=['GET'])
-def download_file():
+@app.route('/download-multiple', methods=['GET'])
+def download_multiple():
     directory = request.args.get('directory')
-    file = request.args.get('file')
-    return send_from_directory(directory, file, as_attachment=True)
+    files = request.args.get('files')
+    files = json.loads(files)  # Parse the JSON string into a Python list
+
+    if not os.path.exists(directory):
+        return "Directory not found", 404
+
+    # Create a ZIP archive in memory
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for file_name in files:
+            file_path = os.path.join(directory, file_name)
+            if os.path.exists(file_path):
+                zip_file.write(file_path, file_name)  # Add file to the ZIP archive
+    zip_buffer.seek(0)
+
+    # Serve the ZIP file for download
+    return send_file(
+        zip_buffer,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name='files.zip'
+    )
 
 @app.route('/download', methods=['GET'])
 def download():
@@ -27,7 +50,7 @@ def list_files():
     directory = request.args.get('directory')
     if not os.path.exists(directory):
         return jsonify([]), 404
-    files = os.listdir(directory)
+    files = [file for file in filter(os.path.isfile, os.listdir(directory))]
     return jsonify(files)
     
 def get_system_info():
