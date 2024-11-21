@@ -48,9 +48,11 @@ def download():
 @app.route('/list-files', methods=['GET'])
 def list_files():
     directory = request.args.get('directory')
-    if not os.path.exists(directory):
+    if not os.path.exists(directory) or not os.path.isdir(directory):
         return jsonify([]), 404
-    files = [file for file in filter(os.path.isfile, os.listdir(directory))]
+    
+    # Get the full path for each file and filter only files
+    files = [file for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
     return jsonify(files)
     
 def get_system_info():
