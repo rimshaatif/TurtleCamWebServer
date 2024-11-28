@@ -6,11 +6,11 @@ import zipfile
 import io
 app = Flask(__name__)
 
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['GET'])
 def upload_file():
     # file = request.files['file']
     # file.save(f'/path/to/save/{file.filename}')
-    # return "File uploaded successfully"
+    # return "File uploaded successfully
     return render_template("upload.html")
 
 @app.route('/download-multiple', methods=['GET'])
