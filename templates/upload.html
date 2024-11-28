@@ -42,21 +42,10 @@
 
     <script>
         document.getElementById('saveButton').addEventListener('click', () => {
-            const timeDelay = document.getElementById('timeDelay').value;
-            const vidLength = document.getElementById('vidLength').value;
-            const outputDir = document.getElementById('outputDir').value;
-
             if (outputDir.trim() === '') {
                 alert('Output directory cannot be empty.');
                 return;
             }
-
-            const config = {
-                timeDelay: parseInt(timeDelay, 10),
-                vidLength: parseInt(vidLength, 10),
-                outputDir: outputDir.trim()
-            };
-
             // Send the config to the backend
             fetch('/save-config', {
                 method: 'POST',
