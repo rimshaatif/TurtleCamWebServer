@@ -43,7 +43,6 @@ def download_multiple():
 
 @app.route('/download', methods=['GET'])
 def download():
-    
     #return send_file(f'/path/to/files/{filename}', as_attachment=True)
     return render_template("download.html")
 
@@ -56,6 +55,17 @@ def list_files():
     # Get the full path for each file and filter only files
     files = [file for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
     return jsonify(files)
+
+@app.route('/save-config', methods=['POST'])
+def save_config():
+    try:
+        config_data = request.get_json()
+        # Save the configuration to the config.json file
+        with open(CONFIG_PATH, 'w') as config_file:
+            json.dump(config_data, config_file, indent=4)
+        return jsonify({"message": "Configuration saved successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 def get_system_info():
     info = {
