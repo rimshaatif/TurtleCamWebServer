@@ -42,28 +42,39 @@
 
     <script>
         document.getElementById('saveButton').addEventListener('click', () => {
+            const timeDelay = document.getElementById('timeDelay').value;
+            const vidLength = document.getElementById('vidLength').value;
+            const outputDir = document.getElementById('outputDir').value;
+
             if (outputDir.trim() === '') {
                 alert('Output directory cannot be empty.');
                 return;
             }
+
+            const config = {
+                timeDelay: parseInt(timeDelay, 10),
+                vidLength: parseInt(vidLength, 10),
+                outputDir: outputDir.trim()
+            };
+
             // Send the config to the backend
             fetch('/save-config', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    timeDelay: document.getElementById('timeDelay').value,
-                    vidLength: document.getElementById('vidLength').value,
-                    outputDir: document.getElementById('outputDir').value
-                })
+                body: JSON.stringify(config)
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Configuration saved:', data);
+            .then(response => {
+                if (response.ok) {
+                    alert('Configuration saved successfully!');
+                } else {
+                    alert('Error saving configuration.');
+                }
             })
-            .catch(error => {
-                console.error('Error saving configuration:', error);
+            .catch(err => {
+                console.error(err);
+                alert('Error communicating with server.');
             });
         });
     </script>
