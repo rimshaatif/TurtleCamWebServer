@@ -9,10 +9,7 @@ app = Flask(__name__)
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'script', 'config.json')
 
 @app.route('/upload', methods=['GET'])
-def upload_file():
-    # file = request.files['file']
-    # file.save(f'/path/to/save/{file.filename}')
-    # return "File uploaded successfully
+def upload():
     return render_template("upload.html")
 
 @app.route('/download-multiple', methods=['GET'])
@@ -68,7 +65,6 @@ def save_config():
             json.dump(config_data, config_file, indent=4)
         return jsonify({"message": "Configuration saved successfully"}), 200
     except Exception as e:
-        print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
     
 def get_system_info():
