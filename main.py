@@ -7,6 +7,7 @@ import io
 app = Flask(__name__)
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'script', 'config.json')
+print(f"Config path: {CONFIG_PATH}")
 
 @app.route('/upload', methods=['GET'])
 def upload_file():
