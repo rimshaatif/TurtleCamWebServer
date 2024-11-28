@@ -62,11 +62,13 @@ def list_files():
 def save_config():
     try:
         config_data = request.get_json()
+        print(f"Received config data: {config_data}")
         # Save the configuration to the config.json file
         with open(CONFIG_PATH, 'w') as config_file:
             json.dump(config_data, config_file, indent=4)
         return jsonify({"message": "Configuration saved successfully"}), 200
     except Exception as e:
+        print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
     
 def get_system_info():
