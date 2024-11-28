@@ -9,7 +9,7 @@ app = Flask(__name__)
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'script', 'config.json')
 
 @app.route('/upload', methods=['GET'])
-def upload():
+def upload_file():
     return render_template("upload.html")
 
 @app.route('/download-multiple', methods=['GET'])
