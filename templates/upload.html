@@ -287,13 +287,13 @@
         });
 
         submitConfigButton.addEventListener('click', () => {
-            console.log(jsonOutput.value)
+            console.log(jsonOutput.textContent)
             fetch('/save-config', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(jsonOutput.value)
+                body: JSON.stringify(jsonOutput.textContent)
             })
             .then(response => {
                 if (response.ok) {
