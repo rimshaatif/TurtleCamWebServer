@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -79,4 +79,210 @@
         });
     </script>
 </body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Configuration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .json-output {
+            margin-top: 20px;
+            background: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Schedule Configuration</h1>
+    <label for="start-delay">Start Delay (seconds):</label>
+    <input type="number" id="start-delay" min="0" placeholder="Enter delay in seconds">
+    <br>
+    <button id="add-start-time">Add Start Time</button>
+    <br>
+    <br>
+    <label for="outputDir">Output Directory:</label><br>
+    <input type="text" id="outputDir" name="outputDir" placeholder="/path/to/output" required>
+    <br>
+    <button id="add-output-dir">Add output dir</button>
+    <br>
+    <button id="add-element">Add New Task</button>
+
+    <div class="popup-overlay" id="popup-overlay"></div>
+    <div class="popup" id="popup">
+        <h2>Add New Element</h2>
+        <label>
+            <input type="checkbox" id="is-video"> Video
+            <input type="checkbox" id="is-picture"> Picture
+        </label>
+        <br>
+        <label for="duration">Duration (seconds, if video):</label>
+        <input type="number" id="duration" min="1" placeholder="Enter duration in seconds" disabled>
+        <br>
+        <label for="pause">Pause After (seconds, optional):</label>
+        <input type="number" id="pause" min="0" placeholder="Enter pause duration in seconds">
+        <br>
+        <button id="save-element">Save</button>
+        <button id="cancel-popup">Cancel</button>
+    </div>
+
+    <h2>Current Schedule</h2>
+    <div class="json-output" id="json-output">[]</div>
+
+    <script>
+        // State to store schedule elements
+        const schedule = [];
+
+        // Get DOM elements
+        const startDelayInput = document.getElementById('start-delay');
+        const outputDirInput = document.getElementById('outputDir');
+        const addStartTime = document.getElementById('add-start-time');
+        const addElementButton = document.getElementById('add-element');
+        const popupOverlay = document.getElementById('popup-overlay');
+        const popup = document.getElementById('popup');
+        const isVideoCheckbox = document.getElementById('is-video');
+        const isPictureCheckbox = document.getElementById('is-picture');
+        const durationInput = document.getElementById('duration');
+        const pauseInput = document.getElementById('pause');
+        const saveElementButton = document.getElementById('save-element');
+        const saveOutputDirButton = document.getElementById('add-output-dir');
+        const cancelPopupButton = document.getElementById('cancel-popup');
+        const jsonOutput = document.getElementById('json-output');
+        
+        let startDelayCount = 0;
+         
+
+        // Show popup
+        addElementButton.addEventListener('click', () => {
+            popup.style.display = 'block';
+            popupOverlay.style.display = 'block';
+        });
+
+        // Close popup
+        cancelPopupButton.addEventListener('click', () => {
+            popup.style.display = 'none';
+            popupOverlay.style.display = 'none';
+        });
+
+        // Enable or disable duration input based on "Video" checkbox
+        isVideoCheckbox.addEventListener('change', () => {
+            durationInput.disabled = !isVideoCheckbox.checked;
+            if (!isVideoCheckbox.checked) {
+                durationInput.value = ''; // Clear value if unchecked
+            }
+        });
+
+        addStartTime.addEventListener('click', () => {
+            startDelayCount += 1;
+            if (startDelayCount === 1) {
+                const element = {
+                    start_delay: startDelayInput.value ? parseFloat(startDelayInput.value) : 0,
+                };
+                schedule.push(element);
+                // Update JSON output
+                jsonOutput.textContent = JSON.stringify(schedule, null, 2);
+                startDelayInput.value = '';
+            } else {
+                alert('Already added a start delay!')
+            }
+        });
+
+        addOrUpdateDirButton.addEventListener('click', () => {
+            const directory = outputDirInput.value.trim();
+
+            if (!directory) {
+                alert('Please specify a valid output directory!');
+                return;
+            }
+
+            // Check if the schedule already has an output_dir property
+            const outputDirElement = schedule.find((el) => el.output_dir !== undefined);
+
+            if (outputDirElement) {
+                // Update the existing output directory
+                outputDirElement.output_dir = directory;
+                alert('Output directory updated!');
+            } else {
+                // Add a new output directory
+                const element = { output_dir: directory };
+                schedule.push(element);
+                alert('Output directory added!');
+            }
+
+            // Update JSON output
+            jsonOutput.textContent = JSON.stringify(schedule, null, 2);
+            outputDirInput.value = '';
+        });
+
+
+        // Save new element to schedule
+        saveElementButton.addEventListener('click', () => {
+            const isVideo = isVideoCheckbox.checked;
+            const duration = isVideo ? parseFloat(durationInput.value) : 0;
+            const pause = pauseInput.value ? parseFloat(pauseInput.value) : 0;
+
+            // Validate inputs
+            if (isVideo && (!duration || duration <= 0)) {
+                alert('Please enter a valid duration for the video.');
+                return;
+            }
+
+            // Create new schedule element
+            const element = {
+                type: isVideo ? 'video' : 'picture',
+                duration: isVideo ? duration : undefined,
+                pause: pause,
+            };
+            schedule.push(element);
+
+            // Update JSON output
+            jsonOutput.textContent = JSON.stringify(schedule, null, 2);
+
+            // Hide popup and clear inputs
+            popup.style.display = 'none';
+            popupOverlay.style.display = 'none';
+            isVideoCheckbox.checked = false;
+            isPictureCheckbox.checked = false;
+            durationInput.value = '';
+            pauseInput.value = '';
+        });
+    </script>
+</body>
 </html>
+
