@@ -28,7 +28,7 @@ process_schedule() {
   local schedule_file="$1"
 
   #output file
-  output_dir=$(jq .output_dir "$schedule_file")
+  output_dir=$(jq -r .output_dir "$schedule_file")
   echo "$output_dir"
 
   #start delay
@@ -50,7 +50,7 @@ process_schedule() {
     elif [ "$type" = "video" ]; then
         if [ -n "$duration" ]; then
             echo "Recording a video for $duration seconds..."
-            take_video "$duration"
+            record_video "$duration"
         else
             echo "Error: Video task requires a duration."
             continue
