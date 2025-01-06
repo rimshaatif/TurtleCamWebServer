@@ -163,13 +163,13 @@
     </div>
 
     <h2>Current Schedule</h2>
-    <div class="json-output" id="json-output">[]</div>
+    <div class="json-output" id="json-output">{}</div>
 
     <button id="submit-config">Submit Config</button>
 
     <script>
         // State to store schedule elements
-        const schedule = [];
+        const schedule = {};
 
         // Get DOM elements
         const startDelayInput = document.getElementById('start-delay');
@@ -189,6 +189,8 @@
         const submitConfigButton = document.getElementById('submit-config');
         
         let startDelayCount = 0;
+
+        schedule.task_list = []
          
 
         // Show popup
@@ -214,10 +216,7 @@
         addStartTime.addEventListener('click', () => {
             startDelayCount += 1;
             if (startDelayCount === 1) {
-                const element = {
-                    start_delay: startDelayInput.value ? parseFloat(startDelayInput.value) : 0,
-                };
-                schedule.push(element);
+                schedule.start_delay = startDelayInput.value ? parseFloat(startDelayInput.value) : 0,
                 // Update JSON output
                 jsonOutput.textContent = JSON.stringify(schedule, null, 2);
                 startDelayInput.value = '';
@@ -234,17 +233,7 @@
                 return;
             }
 
-            // Check if the schedule already has an output_dir property
-            const outputDirElement = schedule.find((el) => el.output_dir !== undefined);
-
-            if (outputDirElement) {
-                // Update the existing output directory
-                outputDirElement.output_dir = directory;
-            } else {
-                // Add a new output directory
-                const element = { output_dir: directory };
-                schedule.push(element);
-            }
+            schedule.output_dir = directory;
 
             // Update JSON output
             jsonOutput.textContent = JSON.stringify(schedule, null, 2);
@@ -270,7 +259,7 @@
                 duration: isVideo ? duration : undefined,
                 pause: pause,
             };
-            schedule.push(element);
+            schedule.task_list.push(element);
 
             // Update JSON output
             jsonOutput.textContent = JSON.stringify(schedule, null, 2);
@@ -285,7 +274,7 @@
         });
 
         submitConfigButton.addEventListener('click', () => {
-            console.log(jsonOutput.textContent)
+            console.log( JSON.stringify(jsonOutput.textContent))
             fetch('/save-config', {
                 method: 'POST',
                 headers: {

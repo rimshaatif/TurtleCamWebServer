@@ -1,5 +1,1 @@
-{
-    "timeDelay": 10,
-    "vidLength": 5,
-    "outputDir": "/home/turtle/Videos"
-}
+"{\n  \"task_list\": [\n    {\n      \"type\": \"picture\",\n      \"pause\": 5\n    },\n    {\n      \"type\": \"video\",\n      \"duration\": 10,\n      \"pause\": 2\n    }\n  ],\n  \"start_delay\": 5,\n  \"output_dir\": \"/home/turtle\"\n}"
