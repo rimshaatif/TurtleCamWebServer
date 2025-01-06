@@ -63,13 +63,13 @@ process_schedule() {
 }
 
 # Main script execution
-if [[ $# -ne 1 ]]; then
+if [ $# -ne 1 ]; then
   echo "Usage: $0 <schedule_file>"
   exit 1
 fi
 
 schedule_file="$1"
-if [[ ! -f "$schedule_file" ]]; then
+if [ ! -f "$schedule_file" ]; then
   echo "Error: Schedule file not found!"
   exit 1
 fi
