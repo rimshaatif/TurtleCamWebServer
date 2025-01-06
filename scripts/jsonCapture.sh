@@ -29,12 +29,11 @@ process_schedule() {
 
   #output file
   output_dir=$(jq -r .output_dir "$schedule_file")
-  echo "$output_dir"
+  mkdir $output_dir
 
   #start delay
   start_delay=$(jq .start_delay "$schedule_file")
-  echo "$start_delay"
-#   sleep "$start_delay"
+  sleep "$start_delay"
   
   # Read and process the JSON schedule using jq
   jq -c '.task_list[]' "$schedule_file" | while read -r task; do
