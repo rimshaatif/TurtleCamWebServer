@@ -44,11 +44,11 @@ process_schedule() {
     
     echo "Processing task: $type"
 
-    if [[ "$type" == "picture" ]]; then
+    if [ "$type" == "picture" ]; then
         echo "Taking a picture..."
         take_picture
-    elif [[ "$type" == "video" ]]; then
-        if [[ -n "$duration" ]]; then
+    elif [ "$type" == "video" ]; then
+        if [ -n "$duration" ]; then
             echo "Recording a video for $duration seconds..."
             take_video "$duration"
         else
@@ -61,7 +61,7 @@ process_schedule() {
     fi
 
     # Pause after the task if specified
-    if [[ -n "$pause" ]]; then
+    if [ -n "$pause" ]; then
         echo "Pausing for $pause seconds..."
         sleep "$pause"
     fi
