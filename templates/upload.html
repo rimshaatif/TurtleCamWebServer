@@ -240,12 +240,10 @@
             if (outputDirElement) {
                 // Update the existing output directory
                 outputDirElement.output_dir = directory;
-                alert('Output directory updated!');
             } else {
                 // Add a new output directory
                 const element = { output_dir: directory };
                 schedule.push(element);
-                alert('Output directory added!');
             }
 
             // Update JSON output
