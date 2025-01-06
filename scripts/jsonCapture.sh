@@ -34,7 +34,7 @@ process_schedule() {
   #start delay
   start_delay=$(jq .start_delay "$schedule_file")
   echo "$start_delay"
-  sleep "$start_delay"
+#   sleep "$start_delay"
   
   # Read and process the JSON schedule using jq
   jq -c '.task_list[]' "$schedule_file" | while read -r task; do
@@ -44,10 +44,10 @@ process_schedule() {
     
     echo "Processing task: $type"
 
-    if [ "$type" == "picture" ]; then
+    if [ "$type" = "picture" ]; then
         echo "Taking a picture..."
         take_picture
-    elif [ "$type" == "video" ]; then
+    elif [ "$type" = "video" ]; then
         if [ -n "$duration" ]; then
             echo "Recording a video for $duration seconds..."
             take_video "$duration"
