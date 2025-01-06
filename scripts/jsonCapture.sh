@@ -29,10 +29,10 @@ process_schedule() {
 
   #output file
   output_dir=$(jq .output_dir "$schedule_file")
-  echo "$start_delay"
+  echo "$output_dir"
 
   #start delay
-  start_delay = $(jq .start_delay "$schedule_file")
+  start_delay=$(jq .start_delay "$schedule_file")
   echo "$start_delay"
   sleep "$start_delay"
   
