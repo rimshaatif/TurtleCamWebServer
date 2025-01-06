@@ -287,6 +287,7 @@
         });
 
         submitConfigButton.addEventListener('click', () => {
+            console.log(jsonOutput.value)
             fetch('/save-config', {
                 method: 'POST',
                 headers: {
