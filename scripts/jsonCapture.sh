@@ -36,32 +36,36 @@ process_schedule() {
   echo "$start_delay"
   sleep "$start_delay"
   
-#   # Read and process the JSON schedule using jq
-#   jq -c '.[]' "$schedule_file" | while read -r task; do
-#     type=$(echo "$task" | jq -r '.type')
-#     duration=$(echo "$task" | jq -r '.duration // empty')
-#     pause=$(echo "$task" | jq -r '.pause // empty')
+  # Read and process the JSON schedule using jq
+  jq -c '.task_list[]' "$schedule_file" | while read -r task; do
+    type=$(echo "$task" | jq -r '.type')
+    duration=$(echo "$task" | jq -r '.duration // empty')
+    pause=$(echo "$task" | jq -r '.pause // empty')
     
-#     if [[ "$type" == "picture" ]]; then
-#       take_picture
-#     elif [[ "$type" == "video" ]]; then
-#       if [[ -n "$duration" ]]; then
-#         take_video "$duration"
-#       else
-#         echo "Error: Video task requires a duration."
-#         continue
-#       fi
-#     else
-#       echo "Unknown task type: $type"
-#       continue
-#     fi
+    echo "Processing task: $type"
 
-#     # Pause after the task if specified
-#     if [[ -n "$pause" ]]; then
-#       echo "Pausing for $pause seconds..."
-#       sleep "$pause"
-#     fi
-#   done
+    if [[ "$type" == "picture" ]]; then
+        echo "Taking a picture..."
+        take_picture
+    elif [[ "$type" == "video" ]]; then
+        if [[ -n "$duration" ]]; then
+            echo "Recording a video for $duration seconds..."
+            take_video "$duration"
+        else
+            echo "Error: Video task requires a duration."
+            continue
+        fi
+    else
+        echo "Unknown task type: $type"
+        continue
+    fi
+
+    # Pause after the task if specified
+    if [[ -n "$pause" ]]; then
+        echo "Pausing for $pause seconds..."
+        sleep "$pause"
+    fi
+    done
 }
 
 # Main script execution
