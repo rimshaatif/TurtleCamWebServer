@@ -194,9 +194,14 @@
                 },
                 body: JSON.stringify({ command: 'sh scripts/jsonCapture.sh scripts/config.json' }),
             })
-                .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(error => console.error('Error:', error));
+            .then(response => {
+                if (response.ok) {
+                    alert('Configuration saved successfully!');
+                } else {
+                    alert('Error saving configuration.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         });
     </script>
     </div>
