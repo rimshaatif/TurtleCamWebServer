@@ -4,9 +4,26 @@ import os
 import json
 import zipfile
 import io
+import subprocess
 app = Flask(__name__)
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'scripts', 'config.json')
+
+@app.route('/run-command', methods=['POST'])
+def run_command():
+    # Get the command from the request
+    data = request.json
+    command = data.get('command')
+
+    if not command:
+        return jsonify({'error': 'No command provided'}), 400
+
+    try:
+        # Run the command
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        return jsonify({'output': result.stdout, 'error': result.stderr, 'returncode': result.returncode})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/upload', methods=['GET'])
 def upload_file():

@@ -55,6 +55,8 @@
 
     <button id="submit-config">Submit Config</button>
 
+    <button id="run-command">Run Config</button>
+
     <script>
         // State to store schedule elements
         const schedule = {};
@@ -75,6 +77,7 @@
         const cancelPopupButton = document.getElementById('cancel-popup');
         const jsonOutput = document.getElementById('json-output');
         const submitConfigButton = document.getElementById('submit-config');
+        const runCommandButton = document.getElementById('run-command');
         
         let startDelayCount = 0;
 
@@ -181,6 +184,19 @@
                 console.error(err);
                 alert('Error communicating with server.');
             });
+        });
+
+        runCommandButton.addEventListener(() => {
+            fetch('/run-command', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ command: 'sh scripts/jsonCapture.sh scripts/config.json' }),
+            })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
         });
     </script>
     </div>
