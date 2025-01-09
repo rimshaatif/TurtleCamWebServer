@@ -186,7 +186,7 @@
             });
         });
 
-        runCommandButton.addEventListener(() => {
+        runCommandButton.addEventListener('click', () => {
             fetch('/run-command', {
                 method: 'POST',
                 headers: {
