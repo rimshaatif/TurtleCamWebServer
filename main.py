@@ -21,7 +21,14 @@ def run_command():
     try:
         # Run the command
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        return jsonify({'output': result.stdout, 'error': result.stderr, 'returncode': result.returncode})
+        # Construct the response with command results
+        response = {
+            'output': result.stdout.strip(),  # Command standard output
+            'error': result.stderr.strip(),  # Command standard error
+            'returncode': result.returncode  # Command return code
+        }
+
+        return jsonify(response), 200 if result.returncode == 0 else 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
