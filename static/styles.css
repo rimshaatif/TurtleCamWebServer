@@ -142,12 +142,31 @@ form {
     border: 1px solid #ddd;
     max-height: 200px;
     overflow-y: auto;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
+
 .file-list li {
-    margin: 5px 0;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+    display: flex; /* Align checkbox and text horizontally */
+    align-items: center; /* Vertically center-align items */
+    margin: 2px 0; /* Consistent vertical spacing between items */
+    padding: 0; /* Reset any padding */
 }
+
+.file-list input[type="checkbox"] {
+    margin-right: 2px; /* Remove default browser margins */
+    width: 16px; /* Optional: set a consistent checkbox size */
+    height: 16px; /* Optional: set a consistent checkbox size */
+}
+
+.file-list label {
+    margin-left: 10px;
+}
+
+.file-list span {
+    margin-left: auto; /* Push file metadata (if any) to the right */
+    padding-left: 10px; /* Optional: add space between the label and metadata */
+}
+
 
 .popup {
     display: none;
