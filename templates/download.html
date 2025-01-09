@@ -4,29 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-File Download</title>
-    <style>
+    <!-- <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             padding: 0;
         }
-        form {
-            margin-bottom: 20px;
-        }
-        .file-list {
-            margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .file-list li {
-            margin: 5px 0;
-        }
-    </style>
+    </style> -->
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <h1>Download Files</h1>
+    <div class="container">
+        <div class="header">
+            <h1>TURTLE CAM</h1>
+        </div>
+        <div class="nav">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('download') }}">Download</a>
+            <a href="{{ url_for('upload_file') }}">Upload</a>
+        </div>
+        <div class="status">
+    <h2>Download Files</h2>
     <form id="fileForm">
         <label for="sourceDir">Source Directory:</label><br>
         <input type="text" id="sourceDir" name="sourceDir" placeholder="/path/to/source" required><br><br>
@@ -45,6 +43,7 @@
         <button type="button" onclick="fetchFileList()">Get Files</button>
         <button type="submit">Download Selected Files</button>
     </form>
+    </div>
 
     <script>
         // Fetch file list from the source directory
@@ -101,5 +100,6 @@
             window.open(downloadUrl, '_blank'); // Start download
         });
     </script>
+    </div>
 </body>
 </html>
