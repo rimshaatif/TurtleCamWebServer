@@ -76,7 +76,10 @@ def list_files():
         return jsonify([]), 404
     
     # Get the full path for each file and filter only files
-    files = [file for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
+    files = [
+    file for file in os.listdir(directory)
+    if os.path.isfile(os.path.join(directory, file)) and not file.endswith('.h264')
+    ]
     return jsonify(files)
 
 @app.route('/save-config', methods=['POST'])
