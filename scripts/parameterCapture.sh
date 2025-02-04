@@ -44,7 +44,7 @@ generate_unique_filename() {
   local filename="${base_name}${extension}"
   
   if [ -e "$output_dir/$filename" ]; then
-    timestamp=$(date +%Y%m%d%H%M%S)
+    timestamp=$(date +%Y-%m-%d__%H-%M-%S)
     filename="${base_name}_${timestamp}${extension}"
   fi
 
