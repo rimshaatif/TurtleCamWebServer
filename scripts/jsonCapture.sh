@@ -5,7 +5,7 @@ sudo apt install jq
 
 # Function to take a picture
 take_picture() {
-  local filename="picture_$(date +%Y%m%d%H%M%S).jpg"
+  local filename="picture_$(date +%Y-%m-%d__%H-%M-%S).jpg"
   libcamera-still -o "$output_dir/$filename" --width 640 --height 480 --quality 80
   echo "Picture saved as $output_dir/$filename"
 }
@@ -13,7 +13,7 @@ take_picture() {
 # Function to record a video
 record_video() {
   local duration_ms=$(( $1 * 1000 ))  # Convert seconds to milliseconds
-  local filename="video_$(date +%Y%m%d%H%M%S).h264"
+  local filename="video_$(date +%Y-%m-%d__%H-%M-%S).h264"
   libcamera-vid -o "$output_dir/$filename" -t "$duration_ms"
   echo "Video recorded as $output_dir/$filename"
 
