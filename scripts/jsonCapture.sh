@@ -36,9 +36,13 @@ process_schedule() {
   #start delay
   start_delay=$(jq .start_delay "$schedule_file")
   sleep "$start_delay"
+
+  # Read the task list into an array
+  mapfile -t tasks < <(jq -c '.task_list[]' "$schedule_file")
   
   # Read and process the JSON schedule using jq
-  jq -c '.task_list[]' "$schedule_file" | while IFS= read -r task; do
+  #jq -c '.task_list[]' "$schedule_file" | while IFS= read -r task; do
+  for task in "${tasks[@]}"; do
     type=$(echo "$task" | jq -r '.type')
     duration=$(echo "$task" | jq -r '.duration // empty')
     pause=$(echo "$task" | jq -r '.pause // empty')
