@@ -14,12 +14,14 @@ take_picture() {
 record_video() {
   local duration_ms=$(( $1 * 1000 ))  # Convert seconds to milliseconds
   local filename="video_$(date +%Y-%m-%d__%H-%M-%S).h264"
-  libcamera-vid -o "$output_dir/$filename" -t "$duration_ms"
+  
+  # Suppress libcamera-vid output
+  libcamera-vid -o "$output_dir/$filename" -t "$duration_ms" > /dev/null 2>&1
   echo "Video recorded as $output_dir/$filename"
 
-  # Convert to MP4
+  # Convert to MP4 (Suppress ffmpeg output)
   local mp4_filename="${filename%.h264}.mp4"
-  ffmpeg -i "$output_dir/$filename" -c:v copy "$output_dir/$mp4_filename"
+  ffmpeg -i "$output_dir/$filename" -c:v copy "$output_dir/$mp4_filename" > /dev/null 2>&1
   echo "Video converted to $output_dir/$mp4_filename"
 }
 
