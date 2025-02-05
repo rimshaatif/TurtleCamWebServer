@@ -38,7 +38,7 @@ process_schedule() {
   sleep "$start_delay"
   
   # Read and process the JSON schedule using jq
-  jq -c '.task_list[]' "$schedule_file" | while read -r task; do
+  jq -c '.task_list[]' "$schedule_file" | while IFS= read -r task; do
     type=$(echo "$task" | jq -r '.type')
     duration=$(echo "$task" | jq -r '.duration // empty')
     pause=$(echo "$task" | jq -r '.pause // empty')
