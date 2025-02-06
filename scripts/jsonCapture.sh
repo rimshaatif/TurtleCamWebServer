@@ -14,12 +14,14 @@ take_picture() {
 record_video() {
   local duration_ms=$(( $1 * 1000 ))  # Convert seconds to milliseconds
   local filename="video_$(date +%Y-%m-%d__%H-%M-%S).h264"
-  libcamera-vid -o "$output_dir/$filename" -t "$duration_ms"
+  
+  # Suppress libcamera-vid output
+  libcamera-vid -o "$output_dir/$filename" -t "$duration_ms" > /dev/null 2>&1
   echo "Video recorded as $output_dir/$filename"
 
-  # Convert to MP4
+  # Convert to MP4 (Suppress ffmpeg output)
   local mp4_filename="${filename%.h264}.mp4"
-  ffmpeg -i "$output_dir/$filename" -c:v copy "$output_dir/$mp4_filename"
+  ffmpeg -i "$output_dir/$filename" -c:v copy "$output_dir/$mp4_filename" > /dev/null 2>&1
   echo "Video converted to $output_dir/$mp4_filename"
 }
 
@@ -34,9 +36,13 @@ process_schedule() {
   #start delay
   start_delay=$(jq .start_delay "$schedule_file")
   sleep "$start_delay"
+
+  # Read the task list into an array
+  mapfile -t tasks < <(jq -c '.task_list[]' "$schedule_file")
   
   # Read and process the JSON schedule using jq
-  jq -c '.task_list[]' "$schedule_file" | while read -r task; do
+  #jq -c '.task_list[]' "$schedule_file" | while IFS= read -r task; do
+  for task in "${tasks[@]}"; do
     type=$(echo "$task" | jq -r '.type')
     duration=$(echo "$task" | jq -r '.duration // empty')
     pause=$(echo "$task" | jq -r '.pause // empty')
