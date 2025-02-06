@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-File Download</title>
-    <!-- <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-        }
-    </style> -->
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -24,83 +17,72 @@
             <a href="{{ url_for('upload_file') }}">Upload</a>
         </div>
         <div class="status">
-    <h2>Download Files</h2>
-    <p><em>Transfer the video and image files from the Turtle Cam to your local device!</em></p>
-    <form id="fileForm">
-        <label for="sourceDir">Source Directory:</label><br>
-        <input type="text" id="sourceDir" name="sourceDir" placeholder="/path/to/source" required><br><br>
-        
-        <label for="destinationDir">Save To (Local Path):</label><br>
-        <input type="text" id="destinationDir" name="destinationDir" placeholder="/path/to/destination" required><br><br>
-        
-        <label for="zipName">ZIP File Name:</label><br>
-        <input type="text" id="zipName" placeholder="Enter ZIP file name (optional)"><br><br>
+            <h2>Download Files</h2>
+            <p><em>Transfer the video and image files from the Turtle Cam to your local device!</em></p>
+            <form id="fileForm">
+                <label for="destinationDir">Save To (Local Path):</label><br>
+                <input type="text" id="destinationDir" name="destinationDir" placeholder="/path/to/destination" required><br><br>
 
-        <label for="fileList">Available Files:</label>
-        <ul id="fileList" class="file-list">
-            <!-- Files will be dynamically populated -->
-        </ul>
-        
-        <button type="button" onclick="fetchFileList()">Get Files</button>
-        <button type="submit">Download Selected Files</button>
-    </form>
-    </div>
+                <label for="zipName">ZIP File Name:</label><br>
+                <input type="text" id="zipName" placeholder="Enter ZIP file name (optional)"><br><br>
 
-    <script>
-        // Fetch file list from the source directory
-        async function fetchFileList() {
-            const sourceDir = document.getElementById('sourceDir').value;
-            if (!sourceDir) {
-                alert("Please enter a source directory.");
-                return;
+                <label for="fileList">Available Files:</label>
+                <ul id="fileList" class="file-list">
+                    <!-- Files will be dynamically populated -->
+                </ul>
+
+                <button type="button" onclick="fetchFileList()">Get Files</button>
+                <button type="submit">Download Selected Files</button>
+            </form>
+        </div>
+
+        <script>
+            const SOURCE_DIR = "/home/turtle/captures"; // Hardcoded source directory
+
+            // Fetch file list from the hardcoded source directory
+            async function fetchFileList() {
+                try {
+                    const response = await fetch(`/list-files?directory=${encodeURIComponent(SOURCE_DIR)}`);
+                    if (!response.ok) throw new Error("Failed to fetch file list");
+
+                    const files = await response.json();
+                    const fileListEl = document.getElementById('fileList');
+                    fileListEl.innerHTML = ''; // Clear the current list
+
+                    if (files.length === 0) {
+                        fileListEl.innerHTML = '<li>No files found in the directory.</li>';
+                        return;
+                    }
+
+                    files.forEach(file => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<label><input type="checkbox" name="selectedFiles" value="${file}"> ${file}</label>`;
+                        fileListEl.appendChild(li);
+                    });
+                } catch (error) {
+                    alert("Error: " + error.message);
+                }
             }
 
-            try {
-                // Replace with your actual backend endpoint
-                const response = await fetch(`/list-files?directory=${encodeURIComponent(sourceDir)}`);
-                if (!response.ok) throw new Error("Failed to fetch file list");
+            // Handle form submission
+            document.getElementById('fileForm').addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent default form submission
 
-                const files = await response.json();
-                const fileListEl = document.getElementById('fileList');
-                fileListEl.innerHTML = ''; // Clear the current list
+                const selectedFiles = Array.from(document.querySelectorAll('input[name="selectedFiles"]:checked'))
+                    .map(input => input.value);
 
-                if (files.length === 0) {
-                    fileListEl.innerHTML = '<li>No files found in the directory.</li>';
+                if (selectedFiles.length === 0) {
+                    alert("Please select at least one file to download.");
                     return;
                 }
 
-                files.forEach(file => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<label><input type="checkbox" name="selectedFiles" value="${file}"> ${file}</label>`;
-                    fileListEl.appendChild(li);
-                });
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
-        }
+                const zipName = document.getElementById("zipName").value || "files";
+                const downloadUrl = `/download-multiple?directory=${encodeURIComponent(SOURCE_DIR)}&files=${encodeURIComponent(JSON.stringify(selectedFiles))}&zipName=${encodeURIComponent(zipName)}`;
 
-        // Handle form submission
-        document.getElementById('fileForm').addEventListener('submit', async (event) => {
-            event.preventDefault(); // Prevent default form submission
-
-            const sourceDir = document.getElementById('sourceDir').value;
-            const selectedFiles = Array.from(document.querySelectorAll('input[name="selectedFiles"]:checked'))
-                .map(input => input.value);
-
-            if (selectedFiles.length === 0) {
-                alert("Please select at least one file to download.");
-                return;
-            }
-
-            // Replace with your actual backend endpoint
-            const zipName = document.getElementById("zipName").value || "files"; 
-            const downloadUrl = `/download-multiple?directory=${encodeURIComponent(sourceDir)}&files=${encodeURIComponent(JSON.stringify(selectedFiles))}&zipName=${encodeURIComponent(zipName)}`;
-
-            // Simulate download (replace this logic with actual backend handling)
-            alert(`Downloading files from ${downloadUrl}`);
-            window.open(downloadUrl, '_blank'); // Start download
-        });
-    </script>
+                // Start download
+                window.open(downloadUrl, '_blank');
+            });
+        </script>
     </div>
 </body>
 </html>

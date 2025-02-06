@@ -18,15 +18,10 @@
         </div>
         <div class="status">
             <h2>Schedule Configuration</h2>
-
+            <p><em>Program your Turtle Cam to set your recording schedule!</em></p>
             <label for="start-delay">Start Delay (seconds):</label><br>
             <input type="number" id="start-delay" min="0" placeholder="Enter delay in seconds">
             <button id="add-start-time">Add Start Time</button>
-            <br><br>
-
-            <label for="outputDir">Output Directory:</label><br>
-            <input type="text" id="outputDir" name="outputDir" placeholder="/path/to/output" required>
-            <button id="add-output-dir">Add Output Dir</button>
             <br><br>
 
             <button id="add-element">Add New Task</button>
@@ -37,8 +32,11 @@
             <h2>Add New Element</h2>
             <label>
                 <input type="checkbox" id="is-video"> Video
+            </label>
+            <label>
                 <input type="checkbox" id="is-picture"> Picture
             </label>
+            <br>
             <label for="duration">Duration (seconds, if video):</label>
             <input type="number" id="duration" min="1" placeholder="Enter duration in seconds" disabled>
             <br>
@@ -59,10 +57,12 @@
     </div>
 
     <script>
-        const schedule = { task_list: [] };
+        const schedule = {
+            task_list: [],
+            output_dir: "/home/turtle/captures"
+        };
 
         const startDelayInput = document.getElementById('start-delay');
-        const outputDirInput = document.getElementById('outputDir');
         const addStartTime = document.getElementById('add-start-time');
         const addElementButton = document.getElementById('add-element');
         const popupOverlay = document.getElementById('popup-overlay');
@@ -72,7 +72,6 @@
         const durationInput = document.getElementById('duration');
         const pauseInput = document.getElementById('pause');
         const saveElementButton = document.getElementById('save-element');
-        const saveOutputDirButton = document.getElementById('add-output-dir');
         const cancelPopupButton = document.getElementById('cancel-popup');
         const taskList = document.getElementById('task-list');
         const submitConfigButton = document.getElementById('submit-config');
@@ -91,10 +90,20 @@
             popupOverlay.style.display = 'none';
         });
 
-        // Enable or disable duration input based on "Video" checkbox
+        // Ensure only one checkbox can be selected at a time
         isVideoCheckbox.addEventListener('change', () => {
-            durationInput.disabled = !isVideoCheckbox.checked;
-            if (!isVideoCheckbox.checked) {
+            if (isVideoCheckbox.checked) {
+                isPictureCheckbox.checked = false;
+                durationInput.disabled = false;
+            } else {
+                durationInput.disabled = true;
+            }
+        });
+
+        isPictureCheckbox.addEventListener('change', () => {
+            if (isPictureCheckbox.checked) {
+                isVideoCheckbox.checked = false;
+                durationInput.disabled = true;
                 durationInput.value = '';
             }
         });
@@ -110,17 +119,6 @@
             }
         });
 
-        saveOutputDirButton.addEventListener('click', () => {
-            const directory = outputDirInput.value.trim();
-            if (!directory) {
-                alert('Please specify a valid output directory!');
-                return;
-            }
-            schedule.output_dir = directory;
-            outputDirInput.value = '';
-            updateTaskList();
-        });
-
         saveElementButton.addEventListener('click', () => {
             const isVideo = isVideoCheckbox.checked;
             const duration = isVideo ? parseFloat(durationInput.value) : 0;
@@ -128,6 +126,11 @@
 
             if (isVideo && (!duration || duration <= 0)) {
                 alert('Please enter a valid duration for the video.');
+                return;
+            }
+
+            if (!isVideo && !isPictureCheckbox.checked) {
+                alert('Please select either Video or Picture.');
                 return;
             }
 
@@ -149,35 +152,34 @@
         });
 
         function formatTime(seconds) {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hrs}h ${mins}m ${secs}s`;
-}
-
-    function updateTaskList() {
-        taskList.innerHTML = '';
-        let totalDuration = schedule.start_delay || 0;
-
-        if (schedule.start_delay !== undefined) {
-            taskList.innerHTML += `<li><strong>Start Delay:</strong> ${schedule.start_delay} sec</li>`;
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hrs}h ${mins}m ${secs}s`;
         }
-        if (schedule.output_dir) {
-            taskList.innerHTML += `<li><strong>Output Directory:</strong> ${schedule.output_dir}</li>`;
+
+        function updateTaskList() {
+            taskList.innerHTML = '';
+            let totalDuration = schedule.start_delay || 0;
+
+            if (schedule.start_delay !== undefined) {
+                taskList.innerHTML += `<li><strong>Start Delay:</strong> ${schedule.start_delay} sec</li>`;
+            }
+            if (schedule.output_dir) {
+                taskList.innerHTML += `<li><strong>Output Directory:</strong> ${schedule.output_dir}</li>`;
+            }
+            schedule.task_list.forEach((task, index) => {
+                taskList.innerHTML += `
+                    <li>
+                        <strong>Task ${index + 1}:</strong> ${task.type.toUpperCase()} 
+                        ${task.duration ? `- Duration: ${task.duration}s` : ''} 
+                        ${task.pause ? `- Pause: ${task.pause}s` : ''}
+                    </li>`;
+                totalDuration += (task.duration || 0) + (task.pause || 0);
+            });
+
+            document.getElementById('total-duration').textContent = formatTime(totalDuration);
         }
-        schedule.task_list.forEach((task, index) => {
-            taskList.innerHTML += `
-                <li>
-                    <strong>Task ${index + 1}:</strong> ${task.type.toUpperCase()} 
-                    ${task.duration ? `- Duration: ${task.duration}s` : ''} 
-                    ${task.pause ? `- Pause: ${task.pause}s` : ''}
-                </li>`;
-            totalDuration += (task.duration || 0) + (task.pause || 0);
-        });
-
-    document.getElementById('total-duration').textContent = formatTime(totalDuration);
-    }
-
 
         submitConfigButton.addEventListener('click', () => {
             fetch('/save-config', {
