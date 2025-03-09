@@ -16,7 +16,7 @@ record_video() {
   local filename="video_$(date +%Y-%m-%d__%H-%M-%S).h264"
   
   # Suppress libcamera-vid output
-  libcamera-vid -o "$output_dir/$filename" -t "$duration_ms" > /dev/null 2>&1
+  libcamera-vid -o "$output_dir/$filename" -t "$duration_ms" --framerate $2 > /dev/null 2>&1
   echo "Video recorded as $output_dir/$filename"
 
   # Convert to MP4 (Suppress ffmpeg output)
@@ -46,6 +46,7 @@ process_schedule() {
     type=$(echo "$task" | jq -r '.type')
     duration=$(echo "$task" | jq -r '.duration // empty')
     pause=$(echo "$task" | jq -r '.pause // empty')
+    framerate=$(echo "$task" | jq -r '.framerate // empty')
     
     echo "Processing task: $type"
 
@@ -55,7 +56,7 @@ process_schedule() {
     elif [ "$type" = "video" ]; then
         if [ -n "$duration" ]; then
             echo "Recording a video for $duration seconds..."
-            record_video "$duration"
+            record_video "$duration" "$framerate"
         else
             echo "Error: Video task requires a duration."
             continue

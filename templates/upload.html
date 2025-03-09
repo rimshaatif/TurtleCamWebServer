@@ -30,15 +30,24 @@
         <div class="popup-overlay" id="popup-overlay"></div>
         <div class="popup" id="popup">
             <h2>Add New Element</h2>
-            <label>
-                <input type="checkbox" id="is-video"> Video
-            </label>
-            <label>
-                <input type="checkbox" id="is-picture"> Picture
-            </label>
-            <br>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label>
+                    <input type="checkbox" id="is-video"> Video
+                </label>
+                <label>
+                    <input type="checkbox" id="is-picture"> Picture
+                </label>
+            </div>
             <label for="duration">Duration (seconds, if video):</label>
             <input type="number" id="duration" min="1" placeholder="Enter duration in seconds" disabled>
+            <br>
+            <label for="framerate">Framerate (fps)</label>
+            <div class="radio-group">
+                <label><input type="radio" name="framerate" value="12"> 12</label>
+                <label><input type="radio" name="framerate" value="24"> 24</label>
+                <label><input type="radio" name="framerate" value="48"> 48</label>
+                <label><input type="radio" name="framerate" value="60" checked> 60</label>
+            </div>
             <br>
             <label for="pause">Pause before next task (seconds, optional):</label>
             <input type="number" id="pause" min="0" placeholder="Enter pause duration in seconds">
@@ -75,8 +84,19 @@
         const cancelPopupButton = document.getElementById('cancel-popup');
         const taskList = document.getElementById('task-list');
         const submitConfigButton = document.getElementById('submit-config');
+        const framerateRadios = document.querySelectorAll('input[name="framerate"]');
 
         let startDelayCount = 0;
+
+        function toggleFramerateOptions() {
+            const isVideoSelected = isVideoCheckbox.checked;
+            framerateRadios.forEach(radio => {
+                radio.disabled = !isVideoSelected; // Enable only if video is selected
+            });
+        }
+
+        isVideoCheckbox.addEventListener('change', toggleFramerateOptions);
+        isPictureCheckbox.addEventListener('change', toggleFramerateOptions);
 
         // Show popup
         addElementButton.addEventListener('click', () => {
@@ -134,10 +154,13 @@
                 return;
             }
 
+            const selectedFramerate = document.querySelector('input[name="framerate"]:checked').value;
+
             const element = {
                 type: isVideo ? 'video' : 'picture',
                 duration: isVideo ? duration : undefined,
                 pause: pause,
+                framerate: selectedFramerate,
             };
             schedule.task_list.push(element);
 
@@ -145,6 +168,7 @@
             popupOverlay.style.display = 'none';
             isVideoCheckbox.checked = false;
             isPictureCheckbox.checked = false;
+            toggleFramerateOptions();
             durationInput.value = '';
             pauseInput.value = '';
 
@@ -173,6 +197,7 @@
                     <li>
                         <strong>Task ${index + 1}:</strong> ${task.type.toUpperCase()} 
                         ${task.duration ? `- Duration: ${task.duration}s` : ''} 
+                        ${task.framerate ? `- Framerate: ${task.framerate}fps` : ''}
                         ${task.pause ? `- Pause: ${task.pause}s` : ''}
                     </li>`;
                 totalDuration += (task.duration || 0) + (task.pause || 0);
@@ -194,6 +219,8 @@
                 alert('Error communicating with server.');
             });
         });
+
+        toggleFramerateOptions();
     </script>
 </body>
 </html>
